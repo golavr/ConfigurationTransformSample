@@ -77,7 +77,7 @@
   </Target>
   -->
   <UsingTask TaskName="TransformXml" AssemblyFile="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Web\Microsoft.Web.Publishing.Tasks.dll" />
-  <Target Name="AfterCompile" Condition="Exists('App.$(Configuration).config')">
+  <Target Name="App_config_AfterCompile" AfterTargets="AfterCompile" Condition="Exists('App.$(Configuration).config')">
     <!--Generate transformed app config in the intermediate directory-->
     <TransformXml Source="App.config" Destination="$(IntermediateOutputPath)$(TargetFileName).config" Transform="App.$(Configuration).config" />
     <!--Force build process to use the transformed configuration file from now on.-->
@@ -89,19 +89,17 @@
     </ItemGroup>
   </Target>
   <!--Override After Publish to support ClickOnce AfterPublish. Target replaces the untransformed config file copied to the deployment directory with the transformed one.-->
-  <Target Name="AfterPublish">
+  <Target Name="App_config_AfterPublish" AfterTargets="AfterPublish" Condition="Exists('App.$(Configuration).config')">
     <PropertyGroup>
       <DeployedConfig>$(_DeploymentApplicationDir)$(TargetName)$(TargetExt).config$(_DeploymentFileMappingExtension)</DeployedConfig>
     </PropertyGroup>
     <!--Publish copies the untransformed App.config to deployment directory so overwrite it-->
     <Copy Condition="Exists('$(DeployedConfig)')" SourceFiles="$(IntermediateOutputPath)$(TargetFileName).config" DestinationFiles="$(DeployedConfig)" />
   </Target>
-  <Target Name="AfterBuild" Condition="Exists('data.$(Configuration).config')">
-    <!--Generate transformed config in the output directory-->
+  <Target Name="data_config_AfterBuild" AfterTargets="AfterBuild" Condition="Exists('data.$(Configuration).config')">
     <TransformXml Source="data.config" Destination="$(OutputPath)data.config" Transform="data.$(Configuration).config" />
   </Target>
-  <Target Name="AfterBuild" Condition="Exists('plainxml.$(Configuration).config')">
-    <!--Generate transformed config in the output directory-->
+  <Target Name="plainxml_config_AfterBuild" AfterTargets="AfterBuild" Condition="Exists('plainxml.$(Configuration).config')">
     <TransformXml Source="plainxml.config" Destination="$(OutputPath)plainxml.config" Transform="plainxml.$(Configuration).config" />
   </Target>
 </Project>
